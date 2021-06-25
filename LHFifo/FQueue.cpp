@@ -67,6 +67,7 @@ FQItem* AllocateFQItem( )
 	if( !pItem ) return NULL;
 	pItem->pInfo = NULL;
 	pItem->pNext = NULL;
+	pItem->pNext = NULL;
 	return pItem;
 }
 void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
