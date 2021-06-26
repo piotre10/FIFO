@@ -41,10 +41,7 @@ QINFO* QFDequeue( QFIFO* q )
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
 	while( !QFEmpty( q ) )
-	{
-		QINFO* pTemp = QFDequeue( q );
-		FreeMem( pTemp );
-	}
+		FreeMem( QFDequeue( q ) );
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
@@ -62,12 +59,11 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 	{
 		printf( "(TF) Error1: Queue does not exist (2)" );
 	}
-	int n = 1;
 	int index = q->nHead;
 	printf( "#######Queue: ######\n" );
-	for( int i = q->nNoElem; i>0; i = i--, n++, index = ( index+1 )%( q->nMaxElem ))
+	for( int i =1 ; i<=q->nNoElem; i++, index = ( index+1 )%( q->nMaxElem ))
 	{
-		printf( "%d. ", n );
+		printf( "%d. ", i );
 		PrintInfo( q->pFQItems[index] );
 	}
 	printf( "####################\n" );

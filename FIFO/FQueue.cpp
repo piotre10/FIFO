@@ -40,11 +40,7 @@ QINFO* QFDequeue( QFIFO* q )
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
 	while( !QFEmpty(q) )
-	{
-		QINFO* pTemp = q->pHead->pInfo;
-		QFDel( q );
-		FreeMem( pTemp );
-	}
+		FreeMem( QFDequeue( q ) );
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
@@ -54,8 +50,6 @@ void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 		return;
 	}
 	QFClear( *q, FreeMem );
-	free( (*q)->pHead );
-	free( ( *q )->pTail );
 	free( *q );
 }
 void QFDel( QFIFO* q )
@@ -74,7 +68,7 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 {
 	if( !q )
 	{
-		printf( "(F) Error1: Queue does not exist (3)\n" );
+		printf( "(F) Error1: Queue does not exist (2)\n" );
 		return;
 	}
 	FQItem* pTemp = q->pHead;

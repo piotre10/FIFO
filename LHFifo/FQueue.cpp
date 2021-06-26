@@ -38,11 +38,7 @@ QINFO* QFDequeue( QFIFO* q )
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
 	while( !QFEmpty(q) )
-	{
-		QINFO* pTemp = q->pHead->pNext->pInfo;
-		QFDel( q );
-		FreeMem( pTemp );
-	}
+		FreeMem( QFDequeue( q ));
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
@@ -52,7 +48,7 @@ void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 		return;
 	}
 	QFClear( *q, FreeMem );
-	free( ( *q )->pHead ); //pHead i pTail wskazuja na ten sam obiekt
+	free( ( *q )->pHead );
 	free( *q );
 }
 void QFDel( QFIFO* q )

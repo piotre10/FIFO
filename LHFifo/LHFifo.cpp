@@ -9,7 +9,7 @@ void FreeUserType( const void* pInfo );
 void PrintUserType( const void* pInfo );
 
 
-int main( ) // poprawic
+int main( )
 {
    QFIFO* pQueue = QFCreate( );
    if( !pQueue )
