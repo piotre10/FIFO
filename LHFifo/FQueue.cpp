@@ -3,13 +3,12 @@
 #include <stdio.h>
 
 void QFDel( QFIFO* q );
-FQItem* AllocateFQItem( );
 
 QFIFO* QFCreate( )
 {
 	QFIFO* pQueue = (QFIFO*)calloc( 1, sizeof( QFIFO ) );
 	if( !pQueue ) return NULL;
-	FQItem* pFirst = AllocateFQItem( );
+	FQItem* pFirst = (FQItem*)calloc( 1, sizeof( FQItem ) );
 	if( !pFirst ) return NULL;
 	pQueue->pHead = pFirst;
 	pQueue->pTail = pFirst;
@@ -17,12 +16,12 @@ QFIFO* QFCreate( )
 }
 int QFEmpty( QFIFO* q )
 {
-	if( q->pHead->pNext==NULL ) return 1;
-	return 0;
+	return !( q&&q->pHead->pNext );
 }
 int QFEnqueue( QFIFO* q, QINFO* pItem )
 {
-	FQItem* pAdded = AllocateFQItem( );
+	if( !q ) return 0;
+	FQItem* pAdded = (FQItem*)calloc( 1, sizeof( FQItem ) );
 	if( !pAdded ) return 0;
 	pAdded->pInfo = pItem;
 	q->pTail->pNext = pAdded;
@@ -38,7 +37,7 @@ QINFO* QFDequeue( QFIFO* q )
 }
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
-	while( q->pHead->pNext )
+	while( !QFEmpty(q) )
 	{
 		QINFO* pTemp = q->pHead->pNext->pInfo;
 		QFDel( q );
@@ -47,27 +46,26 @@ void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
+	if( !q )
+	{
+		printf( "(LH) Error1: Queue does not exist (1)\n" );
+		return;
+	}
 	QFClear( *q, FreeMem );
-	free( ( *q )->pHead );
-	( *q )->pTail = NULL;
-	free( ( *q )->pTail );
+	free( ( *q )->pHead ); //pHead i pTail wskazuja na ten sam obiekt
 	free( *q );
 }
 void QFDel( QFIFO* q )
 {
-	if( QFEmpty( q ) ) return;
+	if( QFEmpty( q ) )
+	{
+		printf( "(LH) Error2: Queue is empty or does not exist item cannot be deleted (1)\n" );
+		return;
+	}
 	FQItem* pDeleted = q->pHead->pNext;
 	q->pHead->pNext = q->pHead->pNext->pNext;
 	if( !( q->pHead->pNext ) ) q->pTail = q->pHead;
 	free( pDeleted );
-}
-FQItem* AllocateFQItem( )
-{
-	FQItem* pItem = (FQItem*)calloc( 1, sizeof( FQItem ) );
-	if( !pItem ) return NULL;
-	pItem->pInfo = NULL;
-	pItem->pNext = NULL;
-	return pItem;
 }
 void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 {
@@ -81,4 +79,5 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 		i++;
 		pTemp = pTemp->pNext;
 	}
+	printf( "####################\n" );
 }

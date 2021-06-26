@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+QINFO* AllocateUserType( );
+void FreeUserType( const void* pInfo );
+void PrintUserType( const void* pInfo );
+
+
 int main( ) // poprawic
 {
    QFIFO* pQueue = QFCreate( );
@@ -79,3 +85,28 @@ int main( ) // poprawic
    return 0;
 }
 
+QINFO* AllocateUserType( )
+{
+   QINFO* pInfo = (QINFO*)calloc( 1, sizeof( QINFO ) );
+   if( !pInfo ) return NULL;
+   char* str = (char*)calloc( NAME_LENGTH+1, sizeof( char ) );
+   if( !str ) return NULL;
+   pInfo->sName = str;
+   return pInfo;
+}
+void FreeUserType( const void* pInfo )
+{
+   QINFO* pInfo2 = (QINFO*)pInfo;
+   free( pInfo2->sName );
+   free( pInfo2 );
+}
+void PrintUserType( const void* pInfo )
+{
+   QINFO* pInfo2 = (QINFO*)pInfo;
+   if( !pInfo2 )
+   {
+      printf( "NULL\n" );
+      return;
+   }
+   printf( "Key: %d   Name: %s\n", pInfo2->nKey, pInfo2->sName );
+}
