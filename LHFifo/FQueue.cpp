@@ -10,13 +10,12 @@ QFIFO* QFCreate( )
 	if( !pQueue ) return NULL;
 	FQItem* pFirst = (FQItem*)calloc( 1, sizeof( FQItem ) );
 	if( !pFirst ) return NULL;
-	pQueue->pHead = pFirst;
-	pQueue->pTail = pFirst;
+	pQueue->pHead = pQueue->pTail = pFirst;
 	return pQueue;
 }
 int QFEmpty( QFIFO* q )
 {
-	return !( q&&q->pHead->pNext );
+	return !( q && q->pHead->pNext );
 }
 int QFEnqueue( QFIFO* q, QINFO* pItem )
 {
@@ -37,12 +36,17 @@ QINFO* QFDequeue( QFIFO* q )
 }
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
+	if( !q )
+	{
+		printf( "(LH) Error1: Queue does not exist (3)\n" );
+		return;
+	}
 	while( !QFEmpty(q) )
 		FreeMem( QFDequeue( q ));
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
-	if( !q )
+	if( !(q && *q ) )
 	{
 		printf( "(LH) Error1: Queue does not exist (1)\n" );
 		return;
@@ -50,6 +54,7 @@ void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 	QFClear( *q, FreeMem );
 	free( ( *q )->pHead );
 	free( *q );
+
 }
 void QFDel( QFIFO* q )
 {
@@ -59,12 +64,17 @@ void QFDel( QFIFO* q )
 		return;
 	}
 	FQItem* pDeleted = q->pHead->pNext;
-	q->pHead->pNext = q->pHead->pNext->pNext;
-	if( !( q->pHead->pNext ) ) q->pTail = q->pHead;
+	q->pHead->pNext = pDeleted->pNext;
+	if( QFEmpty(q) ) q->pTail = q->pHead;
 	free( pDeleted );
 }
 void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 {
+	if( !q )
+	{
+		printf( "(LH) Error1: Queue does not exist (2)\n" );
+		return;
+	}
 	FQItem* pTemp = q->pHead->pNext;
 	int i = 1;
 	printf( "#####Queue: ######\n" );

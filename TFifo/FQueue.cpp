@@ -9,13 +9,9 @@ QFIFO* QFCreate( int nSize )
 {
 	QFIFO* pQueue = (QFIFO*)calloc( 1, sizeof( QFIFO ) );
 	if( !pQueue ) return NULL;
-	QINFO** pTab = (QINFO**)calloc( nSize, sizeof( QINFO* ) );
-	if( !pTab ) return NULL;
-	pQueue->pFQItems = pTab;
+	pQueue->pFQItems = (QINFO**)calloc( nSize, sizeof( QINFO* ) );
+	if( !pQueue->pFQItems ) return NULL;
 	pQueue->nMaxElem = nSize;
-	pQueue->nNoElem = 0;
-	pQueue->nHead = 0;
-	pQueue->nTail = 0;
 	return pQueue;
 }
 int QFEmpty( QFIFO* q )
@@ -40,24 +36,32 @@ QINFO* QFDequeue( QFIFO* q )
 }
 void QFClear( QFIFO* q, void( *FreeMem )( const void* ) )
 {
+	if( !q )
+	{
+		printf( "(TF) Error1: Queue does not exist (3)\n" );
+		return;
+	}
 	while( !QFEmpty( q ) )
 		FreeMem( QFDequeue( q ) );
+	q->nHead = q->nTail = 0;
 }
 void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 {
-	if( !(*q) )
+	if( !( q && *q ) )
 	{
 		printf( "(TF) Error1: Queue does not exist (1)" );
 	}
 	QFClear( *q, FreeMem );
 	free( ( *q )->pFQItems );
 	free( *q );
+	*q = NULL;
 }
 void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 {
 	if( !q )
 	{
 		printf( "(TF) Error1: Queue does not exist (2)" );
+		return;
 	}
 	int index = q->nHead;
 	printf( "#######Queue: ######\n" );
@@ -71,7 +75,12 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 
 void QFDel( QFIFO* q )
 {
-	memset( &( q->pFQItems[q->nHead] ), 0, sizeof( QINFO* ) );
-	q->nHead = ( q->nHead + 1 )%( q->nMaxElem );
+	if( QFEmpty( q ) )
+	{
+		printf( "(TF) Error2: Queue is empty or does not exist item cannot be deleted (1)\n" );
+		return;
+	}
+	q->pFQItems[q->nHead] = NULL;
+	q->nHead = ( q->nHead+1 )%( q->nMaxElem );
 	q->nNoElem--;
 }

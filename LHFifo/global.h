@@ -7,4 +7,3 @@ typedef struct
 } QInfo;
 
 #define QINFO QInfo
-#define NAME_LENGTH 50
