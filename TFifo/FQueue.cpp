@@ -68,7 +68,7 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 	for( int i =1 ; i<=q->nNoElem; i++, index = ( index+1 )%( q->nMaxElem ))
 	{
 		printf( "%d. ", i );
-		PrintInfo( q->pFQItems[index] );
+		if(PrintInfo) PrintInfo( q->pFQItems[index] );
 	}
 	printf( "####################\n" );
 }

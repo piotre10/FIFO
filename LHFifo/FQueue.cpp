@@ -15,7 +15,7 @@ QFIFO* QFCreate( )
 }
 int QFEmpty( QFIFO* q )
 {
-	return !( q && q->pHead->pNext );
+	return !q || !q->pHead->pNext;
 }
 int QFEnqueue( QFIFO* q, QINFO* pItem )
 {
@@ -54,6 +54,7 @@ void QFRemove( QFIFO** q, void( *FreeMem )( const void* ) )
 	QFClear( *q, FreeMem );
 	free( ( *q )->pHead );
 	free( *q );
+	*q = NULL;
 
 }
 void QFDel( QFIFO* q )
@@ -81,7 +82,7 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 	while( pTemp )
 	{
 		printf( "%d. ", i );
-		PrintInfo( pTemp->pInfo );
+		if(PrintInfo) PrintInfo( pTemp->pInfo );
 		i++;
 		pTemp = pTemp->pNext;
 	}

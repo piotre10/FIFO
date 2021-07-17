@@ -10,7 +10,7 @@ QFIFO* QFCreate( )
 }
 int QFEmpty( QFIFO* q )
 {
-	return !( q && q->pHead );
+	return  !q || !q->pHead;
 }
 int QFEnqueue( QFIFO* q, QINFO* pItem )
 {
@@ -62,7 +62,7 @@ void QFDel( QFIFO* q )
 		return;
 	}
 	FQItem* pDeleted = q->pHead;
-	q->pHead = q->pHead->pNext;
+	q->pHead = pDeleted->pNext;
 	if( QFEmpty(q) ) q->pTail = NULL;
 	free( pDeleted );
 }
@@ -79,7 +79,7 @@ void PrintQueue( QFIFO* q, void( *PrintInfo )( const void* ) )
 	while( pTemp )
 	{
 		printf( "%d. ",i );
-		PrintInfo( pTemp->pInfo );
+		if(PrintInfo) PrintInfo( pTemp->pInfo );
 		i++;
 		pTemp = pTemp->pNext;
 	}
